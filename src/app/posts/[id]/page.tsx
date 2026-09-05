@@ -6,6 +6,9 @@ import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
 import { createClient } from "@/lib/supabase/server";
 import LikeButton from "@/components/LikeButton";
+import MockDataBadge from "@/components/MockDataBadge";
+import { USE_MOCK_DATA } from "@/lib/mock/config";
+import { getMockPostById } from "@/lib/mock/data";
 import type { Post } from "@/lib/types";
 
 function formatDate(dateStr: string) {
@@ -29,6 +32,13 @@ export default async function PostDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+
+  if (USE_MOCK_DATA) {
+    const mockPost = getMockPostById(id);
+    if (!mockPost) notFound();
+    return <PostDetailView post={mockPost} isOwner={false} isMock />;
+  }
+
   const supabase = await createClient();
 
   const { data: post } = await supabase
@@ -51,6 +61,20 @@ export default async function PostDetailPage({
   const viewerKey = user?.id ?? `anon:${anonId}`;
   await recordView(id, viewerKey);
 
+  const isOwner = user?.id === post.author_id;
+
+  return <PostDetailView post={post} isOwner={isOwner} isMock={false} />;
+}
+
+function PostDetailView({
+  post,
+  isOwner,
+  isMock,
+}: {
+  post: Post;
+  isOwner: boolean;
+  isMock: boolean;
+}) {
   let contentHtml = "";
   try {
     const json = JSON.parse(post.content) as JSONContent;
@@ -59,10 +83,10 @@ export default async function PostDetailPage({
     contentHtml = `<p>${post.content}</p>`;
   }
 
-  const isOwner = user?.id === post.author_id;
-
   return (
     <article>
+      {isMock && <MockDataBadge />}
+
       <div className="mb-4 flex items-center gap-2 text-xs text-neutral-400">
         <span className="rounded-full bg-neutral-100 px-2 py-0.5 font-medium text-neutral-600">
           {post.category}
@@ -79,7 +103,13 @@ export default async function PostDetailPage({
       />
 
       <div className="mt-8 flex items-center justify-between border-t border-neutral-200 pt-6">
-        <LikeButton postId={post.id} initialLikeCount={post.like_count} />
+        {isMock ? (
+          <span className="text-sm text-neutral-400">
+            좋아요 {post.like_count} (샘플 데이터는 좋아요를 누를 수 없어요)
+          </span>
+        ) : (
+          <LikeButton postId={post.id} initialLikeCount={post.like_count} />
+        )}
         <span className="text-sm text-neutral-400">조회 {post.view_count}</span>
       </div>
 
