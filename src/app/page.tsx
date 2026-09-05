@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import PostCard from "@/components/PostCard";
+import MockDataBadge from "@/components/MockDataBadge";
+import { USE_MOCK_DATA } from "@/lib/mock/config";
+import { getMockPosts } from "@/lib/mock/data";
 import type { Post } from "@/lib/types";
 
 type Tab = "latest" | "hot";
@@ -12,24 +15,33 @@ export default async function HomePage({
 }) {
   const { tab: tabParam, category } = await searchParams;
   const tab: Tab = tabParam === "hot" ? "hot" : "latest";
-  const supabase = await createClient();
 
-  let query = supabase
-    .from("posts")
-    .select("*, profiles!posts_author_id_fkey(id, display_name, avatar_url)");
+  let posts: Post[] | null = null;
+  let error: { message: string } | null = null;
 
-  if (category) {
-    query = query.eq("category", category);
-  }
-
-  if (tab === "hot") {
-    // 조회수 + 좋아요*2 기준 hot_score 컬럼으로 정렬
-    query = query.order("hot_score", { ascending: false }).limit(20);
+  if (USE_MOCK_DATA) {
+    posts = getMockPosts({ tab, category });
   } else {
-    query = query.order("created_at", { ascending: false }).limit(30);
-  }
+    const supabase = await createClient();
+    let query = supabase
+      .from("posts")
+      .select("*, profiles!posts_author_id_fkey(id, display_name, avatar_url)");
 
-  const { data: posts, error } = await query;
+    if (category) {
+      query = query.eq("category", category);
+    }
+
+    if (tab === "hot") {
+      // 조회수 + 좋아요*2 기준 hot_score 컬럼으로 정렬
+      query = query.order("hot_score", { ascending: false }).limit(20);
+    } else {
+      query = query.order("created_at", { ascending: false }).limit(30);
+    }
+
+    const result = await query;
+    posts = result.data as Post[] | null;
+    error = result.error;
+  }
 
   const tabs: { key: Tab; label: string }[] = [
     { key: "latest", label: "전체 글" },
@@ -38,6 +50,8 @@ export default async function HomePage({
 
   return (
     <div>
+      {USE_MOCK_DATA && <MockDataBadge />}
+
       <div className="mb-6 flex gap-2 border-b border-neutral-200">
         {tabs.map((t) => (
           <Link
@@ -67,7 +81,7 @@ export default async function HomePage({
       )}
 
       <div className="flex flex-col gap-3">
-        {(posts as Post[] | null)?.map((post, idx) => (
+        {posts?.map((post, idx) => (
           <PostCard key={post.id} post={post} rank={tab === "hot" ? idx + 1 : undefined} />
         ))}
       </div>
