@@ -1,0 +1,7 @@
+# 실제 값을 채운 뒤 파일명을 terraform.tfvars 로 저장하세요. (terraform.tfvars는 .gitignore 처리됨)
+project_name = "vibe-venture-blog"
+environment  = "prod"
+location     = "koreacentral"
+
+supabase_url      = "https://your-project-ref.supabase.co"
+supabase_anon_key = "your-anon-or-publishable-key"
