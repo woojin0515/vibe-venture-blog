@@ -36,10 +36,24 @@ npm run dev
 ```
 http://localhost:3000 접속
 
+## 목업(샘플) 데이터로 개발하기
+DB에 글이 없어도 로컬에서 풍성한 콘텐츠로 UI를 확인할 수 있도록,
+`src/lib/mock/data.ts`에 20개의 샘플 글(다양한 카테고리, 조회수/좋아요 값 차등)을 준비해뒀습니다.
+
+- `.env.local`에 `USE_MOCK_DATA=true`를 설정하면 메인 피드(전체 글/Hot Trend)와
+  글 상세 페이지가 실제 Supabase 대신 이 샘플 데이터를 보여줍니다.
+- 샘플 데이터는 **읽기 전용**입니다. 좋아요/조회수는 실제로 증가하지 않고, 상세 페이지에
+  "🧪 개발용 샘플 데이터" 배지가 표시됩니다. 실제 DB에는 어떠한 값도 저장되지 않습니다.
+- `USE_MOCK_DATA`는 `NEXT_PUBLIC_` 접두사가 없는 서버 전용 환경변수이므로 클라이언트
+  번들에 노출되지 않습니다.
+- **배포 환경(Vercel 등)에는 이 환경변수를 절대 설정하지 마세요.** 값이 없으면 항상
+  `false`로 취급되어 실제 DB 데이터만 사용합니다.
+
 ## 폴더 구조
 - `src/app` — 라우트 (메인, 로그인, 글쓰기, 상세, 마이페이지)
-- `src/components` — Header, PostCard, LikeButton, TiptapEditor
+- `src/components` — Header, PostCard, LikeButton, TiptapEditor, MockDataBadge
 - `src/lib/supabase` — 브라우저/서버/미들웨어 Supabase 클라이언트
+- `src/lib/mock` — 로컬 개발용 목업 데이터 및 `USE_MOCK_DATA` 플래그
 - `supabase/schema.sql` — DB 스키마, RLS 정책, 트리거 (조회수/좋아요 자동 집계)
 
 ## 참고
