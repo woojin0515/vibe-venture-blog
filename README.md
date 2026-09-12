@@ -44,8 +44,8 @@ http://localhost:3000 접속
 - `npm run build`
 - `npm test`
 
-현재 `package.json`에 `scripts.test`가 없으면 CI가 실패하도록 설정되어 있습니다.  
-원하는 테스트 러너(Vitest/Jest 등)를 추가하고 `npm test`가 동작하도록 설정하면, 코드 푸시마다 테스트와 품질 검증이 함께 수행됩니다.
+현재 기본 테스트 명령은 `node --test`로 설정되어 있습니다.  
+추후 Vitest/Jest를 도입하면 `scripts.test`만 바꿔서 동일한 CI 파이프라인에서 그대로 검증할 수 있습니다.
 
 ## 목업(샘플) 데이터로 개발하기
 DB에 글이 없어도 로컬에서 풍성한 콘텐츠로 UI를 확인할 수 있도록,
