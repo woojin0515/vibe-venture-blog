@@ -36,6 +36,17 @@ npm run dev
 ```
 http://localhost:3000 접속
 
+## GitHub CI (푸시/PR 자동 검증)
+`.github/workflows/ci.yml`이 설정되어 있어, GitHub에 푸시하거나 PR을 열면 아래 검증이 자동 실행됩니다.
+
+- `npm ci`
+- `npm run lint`
+- `npm run build`
+- `npm test`
+
+현재 `package.json`에 `scripts.test`가 없으면 CI가 실패하도록 설정되어 있습니다.  
+원하는 테스트 러너(Vitest/Jest 등)를 추가하고 `npm test`가 동작하도록 설정하면, 코드 푸시마다 테스트와 품질 검증이 함께 수행됩니다.
+
 ## 목업(샘플) 데이터로 개발하기
 DB에 글이 없어도 로컬에서 풍성한 콘텐츠로 UI를 확인할 수 있도록,
 `src/lib/mock/data.ts`에 20개의 샘플 글(다양한 카테고리, 조회수/좋아요 값 차등)을 준비해뒀습니다.
