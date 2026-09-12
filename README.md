@@ -47,6 +47,19 @@ http://localhost:3000 접속
 현재 기본 테스트 명령은 `node --test`로 설정되어 있습니다.  
 추후 Vitest/Jest를 도입하면 `scripts.test`만 바꿔서 동일한 CI 파이프라인에서 그대로 검증할 수 있습니다.
 
+## GitHub CD (CI 성공 후 자동 배포)
+`.github/workflows/cd.yml`이 추가되어 다음 조건에서 Azure App Service로 자동 배포됩니다.
+
+- `master` 브랜치에 `push`
+- 그리고 해당 커밋의 `CI` 워크플로가 `success`
+
+또한 `workflow_dispatch`를 지원해 Actions 탭에서 수동 배포도 가능합니다.
+
+CD 동작을 위해 GitHub Repository Secrets에 아래 값을 등록하세요.
+
+- `AZURE_WEBAPP_NAME`: Azure App Service 이름 (`terraform output app_service_name`)
+- `AZURE_WEBAPP_PUBLISH_PROFILE`: Azure Portal > App Service > Get publish profile XML 전체
+
 ## 목업(샘플) 데이터로 개발하기
 DB에 글이 없어도 로컬에서 풍성한 콘텐츠로 UI를 확인할 수 있도록,
 `src/lib/mock/data.ts`에 20개의 샘플 글(다양한 카테고리, 조회수/좋아요 값 차등)을 준비해뒀습니다.
